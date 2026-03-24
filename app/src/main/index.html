@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +6,7 @@
     <title>JPM Executive Suite | Sanvi Aryan</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --jpm-gold: #AD936E; --gold-gradient: linear-gradient(135deg, #AD936E 0%, #E7D7B3 50%, #AD936E 100%); --bg-grey: #F5F5F5; }
+        :root { --jpm-gold: #AD936E; --gold-gradient: linear-gradient(135deg, #AD936E 0%, #E7D7B3 50%, #AD936E 100%); --bg-grey: #F5F5F5; --jpm-black: #000000; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #000; height: 100vh; overflow: hidden; }
 
@@ -19,14 +18,9 @@
         .spinner { width: 45px; height: 45px; border: 3px solid #F0F0F0; border-top: 3px solid var(--jpm-gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #induction-popup { position: fixed; inset: 0; z-index: 20000; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(10px); }
-        .popup-card { background: #FFF; width: 100%; max-width: 350px; border-radius: 20px; padding: 30px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-
-        /* --- SIDEBAR --- */
-        #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 14000; display: none; }
-        #sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: #FFF; z-index: 15000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 40px 20px; }
-        #sidebar.open { left: 0; }
-        .menu-item { padding: 18px 10px; border-bottom: 1px solid #F0F0F0; font-size: 14px; font-weight: 500; display: flex; align-items: center; }
+        /* --- NEW: COUNTDOWN OVERLAY --- */
+        #entry-pass-overlay { position: fixed; inset: 0; background: #000; z-index: 25000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .timer-unit { background: #111; border: 1px solid #333; padding: 15px; border-radius: 12px; min-width: 80px; text-align: center; }
 
         /* --- PIN PAD --- */
         .full-screen { position: fixed; inset: 0; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; color: #FFF; }
@@ -42,23 +36,15 @@
         .view { padding: 20px; display: none; }
         .view.active { display: block; }
 
-        /* --- CARDS --- */
+        /* --- CARDS & UI --- */
         .card { background: #FFF; padding: 20px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #EAEAEA; }
         .tag { font-size: 9px; font-weight: 800; color: var(--jpm-gold); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; display: block; }
-        input[type="date"] { width: 100%; padding: 12px; border: 1px solid #DDD; border-radius: 8px; margin-top: 5px; font-size: 14px; }
         .btn-action { width: 100%; padding: 16px; background: #000; color: #FFF; border: none; border-radius: 10px; font-weight: 700; margin-top: 15px; }
 
-        /* --- ROTATOR CARDS --- */
-        .rotator { perspective: 1000px; width: 100%; height: 180px; margin-bottom: 15px; }
-        .rotator-inner { position: relative; width: 100%; height: 100%; transition: 0.6s; transform-style: preserve-3d; }
-        .rotator.flipped .rotator-inner { transform: rotateY(180deg); }
-        .side { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .front { background: #000; color: #FFF; border: 1px solid #333; }
-        .back { background: #FFF; transform: rotateY(180deg); border: 1px solid #DDD; }
-
-        /* --- CALENDAR --- */
-        .event-item { display: flex; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid #F9F9F9; }
-        .event-date { background: #F5F5F5; padding: 8px; border-radius: 8px; text-align: center; min-width: 45px; margin-right: 15px; }
+        /* --- SIDEBAR --- */
+        #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 14000; display: none; }
+        #sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: #FFF; z-index: 15000; transition: 0.3s; padding: 40px 20px; }
+        #sidebar.open { left: 0; }
 
         /* --- NAV --- */
         nav { position: fixed; bottom: 0; width: 100%; background: #FFF; display: flex; padding: 10px 0 25px; border-top: 1px solid #EEE; z-index: 1000; }
@@ -74,19 +60,6 @@
         <div id="status" style="margin-top:20px; font-size:13px; font-weight:600; color:#666;">Synchronizing...</div>
     </div>
 
-    <div id="sidebar-overlay" onclick="toggleMenu(false)"></div>
-    <div id="sidebar">
-        <div style="font-size:24px; margin-bottom:30px;" onclick="toggleMenu(false)">✕</div>
-        <div style="margin-bottom:30px;">
-            <h3 style="font-family:'Playfair Display';">Sanvi Aryan</h3>
-            <p style="font-size:11px; color:gray;">JPM-990422</p>
-        </div>
-        <div class="menu-item">Personal Documents</div>
-        <div class="menu-item">Residential Services</div>
-        <div class="menu-item" onclick="location.reload()">Refresh System</div>
-        <div class="menu-item" style="color:red; margin-top:40px;" onclick="localStorage.clear(); location.reload();">Logout Profile</div>
-    </div>
-
     <div id="pin-screen" class="full-screen">
         <h2 style="font-family:'Playfair Display';">Sanvi Aryan</h2>
         <div style="display:flex; margin:40px 0;">
@@ -100,7 +73,56 @@
         </div>
     </div>
 
+    <div id="entry-pass-overlay">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <span class="gold-text" style="font-size: 10px; letter-spacing: 4px; text-transform: uppercase;">Official Commencement</span>
+            <h1 style="color: white; font-family: 'Playfair Display', serif; font-size: 28px; margin-top: 10px;">Welcome, Sanvi Aryan</h1>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 40px;">
+            <div class="timer-unit">
+                <span id="welcome-days" style="display: block; font-size: 32px; color: white; font-weight: 700;">00</span>
+                <label style="font-size: 8px; color: var(--jpm-gold); letter-spacing: 2px;">DAYS</label>
+            </div>
+            <div class="timer-unit">
+                <span id="welcome-hours" style="display: block; font-size: 32px; color: white; font-weight: 700;">00</span>
+                <label style="font-size: 8px; color: var(--jpm-gold); letter-spacing: 2px;">HOURS</label>
+            </div>
+            <div class="timer-unit">
+                <span id="welcome-mins" style="display: block; font-size: 32px; color: white; font-weight: 700;">00</span>
+                <label style="font-size: 8px; color: var(--jpm-gold); letter-spacing: 2px;">MINS</label>
+            </div>
+        </div>
+
+        <div style="background: white; width: 100%; max-width: 320px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.5);">
+            <div style="background: #000; padding: 20px; text-align: left; border-bottom: 2px solid var(--jpm-gold);">
+                <p style="color: var(--jpm-gold); font-size: 8px; letter-spacing: 2px;">GOREGAON CAMPUS ACCESS</p>
+                <h2 style="color: white; font-size: 18px; font-family: 'Playfair Display';">NKP | 5th Floor</h2>
+            </div>
+            <div style="padding: 25px; text-align: center;">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=JPM-SANVI-NKP-GOREGAON-ACCESS" style="width: 140px; margin-bottom: 15px;">
+                <p style="font-size: 13px; font-weight: 700; color: #000;">SANVI ARYAN</p>
+                <p style="font-size: 10px; color: #666; margin-bottom: 20px;">Reporting: 09:30 AM | March 29, 2026</p>
+                <button onclick="dismissCountdown()" class="btn-action" style="margin-top:0; border-radius: 12px;">ENTER WORKSPACE</button>
+            </div>
+        </div>
+        <p style="color: #444; font-size: 9px; margin-top: 30px; letter-spacing: 1px;">ID: JPM-SECURE-ACCESS-2026</p>
+    </div>
+
     <div id="app-shell">
+        <div id="sidebar-overlay" onclick="toggleMenu(false)"></div>
+        <div id="sidebar">
+            <div style="font-size:24px; margin-bottom:30px;" onclick="toggleMenu(false)">✕</div>
+            <div style="margin-bottom:30px;">
+                <h3 style="font-family:'Playfair Display';">Sanvi Aryan</h3>
+                <p style="font-size:11px; color:gray;">JPM-990422</p>
+            </div>
+            <div class="menu-item">Personal Documents</div>
+            <div class="menu-item">Residential Services</div>
+            <div class="menu-item" onclick="location.reload()">Refresh System</div>
+            <div class="menu-item" style="color:red; margin-top:40px;" onclick="localStorage.clear(); location.reload();">Logout Profile</div>
+        </div>
+
         <header>
             <div onclick="toggleMenu(true)" style="font-size:20px;">☰</div>
             <div style="font-family:'Playfair Display'; font-weight:700;">JPM MASTER</div>
@@ -113,94 +135,51 @@
                     <span class="tag">Compliance</span>
                     <h3 style="font-family:'Playfair Display'; margin:5px 0 15px;">Final Declaration</h3>
                     <div style="height:140px; overflow-y:auto; background:#FAFAFA; padding:12px; font-size:11px; border-radius:8px; line-height:1.6; border:1px solid #EEE; margin-bottom:15px;">
-                        <b>Rectification:</b> I Sanvi Aryan Acknowledge That I Have Paid 6,97,000/- For Flags Rectification Against My Profile, My Profile Is Cleared For Joining & The Only Remaining DPD Is 10,000/-, No Further Payments & Compliance are pending<br><br>
-                        <b>Guardian Visit:</b> Required on or by 15th April 2026. Penalty of ₹15,000/- for non-compliance.<br><br>
-                        <b>Residential:</b> Unit 804 Regent Hills NOC & Goodies Handover subject to signature.
+                        <b>Rectification:</b> I Sanvi Aryan Acknowledge That I Have Paid 6,97,000/- For Flags Rectification against my profile. No further payments pending.<br><br>
+                        <b>Residential:</b> Unit 804 Regent Hills NOC handover subject to signature.
                     </div>
-                    <label class="tag" style="color:#888;">Guardian Visit Date</label>
-                    <input type="date" id="date_g">
-                    <label class="tag" style="color:#888; margin-top:10px;">Goodies Collection</label>
-                    <input type="date" id="date_k">
-                    <button class="btn-action" onclick="submitSignature()">SIGN & LOCK</button>
+                    <button class="btn-action" onclick="submitSignature()">SIGN & LOCK PROFILE</button>
                 </div>
                 <div id="legal-success" class="card" style="display:none; text-align:center; padding:40px 20px;">
                     <div style="color:green; font-size:40px;">✓</div>
                     <h3 style="font-family:'Playfair Display'; margin-top:10px;">Certification Locked</h3>
-                    <p style="font-size:12px; color:gray; margin-top:5px;">Profile digitally signed and filed.</p>
-                </div>
-            </div>
-
-            <div id="v-payroll" class="view">
-                <div class="card">
-                    <span class="tag">IDBI Salary Account</span>
-                    <div style="display:flex; align-items:center; margin-top:10px;">
-                        <div style="width:40px; height:40px; background:#F37021; border-radius:6px; color:white; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:11px; margin-right:15px;">IDBI</div>
-                        <div>
-                            <div style="font-size:14px; font-weight:700;">IDBI Bank Ltd</div>
-                            <div style="font-size:11px; color:#666;">xxxx xxxx 4608</div>
-                        </div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:20px; font-size:13px;"><span>Monthly:</span> <b>₹1,34,720</b></div>
                 </div>
             </div>
 
             <div id="v-profile" class="view">
                 <div class="card">
-                    <span class="tag">Executive Details</span>
-                    <h2 style="font-family:'Playfair Display';">Sanvi Aryan - 26LPA</h2>
-                    <p style="font-size:11px; color:gray;">JPM-990422 | aryansanvi@jpmcpowai.in</p>
-                </div>
-                
-                <div class="rotator" onclick="this.classList.toggle('flipped')">
-                    <div class="rotator-inner">
-                        <div class="side front">
-                            <span class="tag" style="color:#555;">RESIDENTIAL UNIT</span>
-                            <div class="gold-text" style="font-size:48px; font-family:'Playfair Display';">804</div>
-                            <p style="font-size:9px; letter-spacing:2px; color:#555;">REGENT HILLS</p>
+                    <span class="tag">Bespoke Executive Set</span>
+                    <div style="display:flex; align-items:center; gap:15px; margin-top:10px;">
+                        <img src="https://static.vecteezy.com/system/resources/thumbnails/069/726/273/small/black-business-suit-jacket-and-skirt-with-white-shirt-underneath-stylish-professional-attire-png.png" style="width:80px; height:auto; background:#f9f9f9; padding:5px; border-radius:8px;">
+                        <div>
+                            <div style="font-size:14px; font-weight:700;">8-Piece Wardrobe Bundle</div>
+                            <div style="font-size:11px; color:#666;">2 Blazers, 2 Skirts, 2 Trousers, 2 Shirts</div>
                         </div>
-                        <div class="side back"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=R804" style="width:80px;"></div>
                     </div>
                 </div>
-
-                <div class="rotator" onclick="this.classList.toggle('flipped')">
-                    <div class="rotator-inner">
-                        <div class="side front" style="background:#1d4ed8;">
-                            <span class="gold-text" style="font-size:24px; font-weight:900;">sodexo</span>
-                            <div style="margin-top:20px; font-family:monospace; color:#FFF; font-size:12px;">XXXX XXXX XXXX 4022</div>
-                        </div>
-                        <div class="side back"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=SODEXO" style="width:80px;"></div>
-                    </div>
+                <div class="card">
+                    <span class="tag">Housing</span>
+                    <h2 style="font-family:'Playfair Display';">Regent Hills | 804</h2>
+                    <p style="font-size:11px; color:gray;">Oshiwara, Andheri (West), Mumbai</p>
                 </div>
             </div>
 
             <div id="v-hr" class="view">
                 <div class="card">
-                    <span class="tag">Upcoming Events</span>
-                    <div class="event-item">
-                        <div class="event-date"><b>16</b><br><small>MAR</small></div>
-                        <div><div style="font-weight:700; font-size:14px;">Induction Day</div><div style="font-size:11px; color:gray;">NKP Goregaon • 10:30 AM</div></div>
-                    </div>
-                    <div class="event-item">
-                        <div class="event-date"><b>16</b><br><small>MAR</small></div>
-                        <div><div style="font-weight:700; font-size:14px;">Team Potluck</div><div style="font-size:11px; color:gray;">Cafeteria Wing B • 01:30 PM</div></div>
-                    </div>
-                    <div class="event-item" style="border:none;">
-                        <div class="event-date"><b>15</b><br><small>APR</small></div>
-                        <div><div style="font-weight:700; font-size:14px;">Guardian Policy Sign-off</div><div style="font-size:11px; color:gray;">Admin Office • 11:00 AM</div></div>
+                    <span class="tag">Reporting Venue</span>
+                    <div style="margin-top:10px;">
+                        <div style="font-weight:700; font-size:16px;">NKP 5th Floor</div>
+                        <div style="font-size:12px; color:gray;">Goregaon Office • 09:30 AM</div>
                     </div>
                 </div>
-                <iframe src="https://jpmcpowaiio.github.io/nirlongoregaon/" style="width:100%; height:400px; border:none; border-radius:15px;"></iframe>
+                <iframe src="https://jpmcpowaiio.github.io/nirlongoregaon/" style="width:100%; height:300px; border:none; border-radius:15px;"></iframe>
             </div>
-
-            <div id="v-perks" class="view" style="height:100%; padding:0;"><iframe src="https://jpmcpowaiio.github.io/giftic/" style="width:100%; height:100%; border:none;"></iframe></div>
         </div>
 
         <nav>
-            <div class="tab active" onclick="navTo('legal', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M14,10H19.5L14,4.5V10M5,3H15L21,9V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3M5,5V19H19V12H12V5H5Z"/></svg>Legal</div>
-            <div class="tab" onclick="navTo('payroll', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M11,17V16H9V14H13V13H11A2,2 0 0,1 9,11V9A2,2 0 0,1 11,7V6H13V7H15V9H11V10H13A2,2 0 0,1 15,12V14A2,2 0 0,1 13,16V17H11Z"/></svg>Payroll</div>
-            <div class="tab" onclick="navTo('profile', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg>Profile</div>
-            <div class="tab" onclick="navTo('hr', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M13,9V3.5L18.5,9M6,2C4.89,2 4,2.89 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"/></svg>HR</div>
-            <div class="tab" onclick="navTo('perks', this)"><svg class="icon" viewBox="0 0 24 24"><path d="M22,20V8A2,2 0 0,0 20,6H16.19C16.39,5.7 16.5,5.36 16.5,5A2.5,2.5 0 0,0 14,2.5C13,2.5 12.16,3.09 11.75,3.94L12,4L12.25,3.94C11.84,3.09 11,2.5 10,2.5A2.5,2.5 0 0,0 7.5,5C7.5,5.36 7.61,5.7 7.81,6H4A2,2 0 0,0 2,8V20A2,2 0 0,0 4,22H20A2,2 0 0,0 22,20"/></svg>Perks</div>
+            <div class="tab active" onclick="navTo('legal', this)">Legal</div>
+            <div class="tab" onclick="navTo('profile', this)">Profile</div>
+            <div class="tab" onclick="navTo('hr', this)">HR</div>
         </nav>
     </div>
 
@@ -210,7 +189,7 @@
         let sig = localStorage.getItem('mx_s');
 
         function bootApp() {
-            if(!sP) document.querySelector('h2').innerText = "Register Access Pin";
+            if(!sP) document.querySelector('h2').innerText = "Set Access Pin";
             if(sig) lockView();
         }
 
@@ -226,8 +205,29 @@
             if(!sP) { localStorage.setItem('mx_p', p); location.reload(); }
             else if(p === sP) {
                 document.getElementById('pin-screen').style.display = 'none';
-                document.getElementById('app-shell').style.display = 'flex';
-            } else { alert("Error"); clrPin(); }
+                document.getElementById('entry-pass-overlay').style.display = 'flex';
+                runCountdown();
+            } else { alert("Incorrect Pin"); clrPin(); }
+        }
+
+        function runCountdown() {
+            const joiningDate = new Date("March 29, 2026 09:30:00").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = joiningDate - now;
+                if (diff < 0) return;
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById("welcome-days").innerText = d.toString().padStart(2, '0');
+                document.getElementById("welcome-hours").innerText = h.toString().padStart(2, '0');
+                document.getElementById("welcome-mins").innerText = m.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        function dismissCountdown() {
+            document.getElementById('entry-pass-overlay').style.display = 'none';
+            document.getElementById('app-shell').style.display = 'flex';
         }
 
         function clrPin() { p = ""; document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('filled')); }
@@ -243,16 +243,12 @@
         }
 
         function submitSignature() {
-            if(!document.getElementById('date_g').value || !document.getElementById('date_k').value) return alert("Select Dates");
             const load = document.getElementById('loading-overlay');
-            const stat = document.getElementById('status');
             load.style.display = 'flex';
-            setTimeout(() => { stat.innerText = "Encrypting Profile..."; }, 1500);
             setTimeout(() => { 
-                stat.innerHTML = "<span style='color:green;'>Success</span>";
                 localStorage.setItem('mx_s', 'true');
-                setTimeout(() => { load.style.display = 'none'; lockView(); }, 1000);
-            }, 3500);
+                load.style.display = 'none'; lockView(); 
+            }, 2500);
         }
 
         function lockView() {
@@ -262,4 +258,3 @@
     </script>
 </body>
 </html>
- 
